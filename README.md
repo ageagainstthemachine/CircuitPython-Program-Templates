@@ -16,9 +16,9 @@ Each template is thoroughly documented and comes with preconfigured settings via
   - Memory monitoring
   - Modular configuration via `settings.toml`
 
-## `asyncio` Program Template Details
----
-### Key Features
+### `asyncio` Program Template Details
+
+#### Key Features
 
 - **Modular & Configurable:**  
   Easily enable/disable features (Wi-Fi, NTP, syslog, etc.) by editing `settings.toml`.
@@ -43,7 +43,7 @@ Each template is thoroughly documented and comes with preconfigured settings via
 - **Open Source:**  
   Distributed under the GPL-3.0 License.
 
-### Minimum Required Libraries
+#### Minimum Required Libraries
 
 For this template to run correctly, please ensure that the following libraries are installed in the `lib` directory or present in the firmware build (some of these are included in the official CircuitPython bundle):
 
@@ -63,7 +63,7 @@ For this template to run correctly, please ensure that the following libraries a
 
 *Note:* Some of these libraries are available as part of the [CircuitPython Bundle](https://circuitpython.org/libraries) provided by Adafruit. Make sure you are using a version of CircuitPython that supports `asyncio` (v9.x or later is recommended).
 
-### Getting Started
+#### Getting Started
 
 1. **Clone the Repository:**
     - bash: git clone, etc.
@@ -81,9 +81,9 @@ For this template to run correctly, please ensure that the following libraries a
      - Synchronize time using NTP (with optional DST adjustments and server configurability)
      - Start the main asynchronous tasks (including a dummy task for demonstration)
 
-### Code Structure & Documentation
+#### Code Structure & Documentation
 
-#### Code Overview
+##### Code Overview
 
 - **Configuration Class:**  
   Loads settings from `settings.toml` and converts them into easy-to-access environment variables.
@@ -100,7 +100,7 @@ For this template to run correctly, please ensure that the following libraries a
 - **Task Management:**  
   Demonstrates how to structure asynchronous tasks using `asyncio`. The `dummy_task()` serves as an example of a periodic task.
 
-#### Adding New Tasks
+##### Adding New Tasks
 
 To add a new asynchronous task:
 
@@ -116,11 +116,11 @@ To add a new asynchronous task:
 3. **Logging & Error Handling:**  
    Use `structured_log()` to record key events and errors in a unified manner. Optionally, incorporate memory monitoring during critical operations using `monitor_memory()`.
 
-### Configuration Settings
+#### Configuration Settings
 
 Below is a detailed explanation of the configurable settings available in `settings.toml`:
 
-#### Network Configuration
+##### Network Configuration
 
 - **WIFI_ENABLED**  
   *Value:* `"TRUE"` or `"FALSE"`  
@@ -134,7 +134,7 @@ Below is a detailed explanation of the configurable settings available in `setti
   *Value:* Your Wi-Fi network password (e.g., `"Your_PSK"`)  
   *Description:* The pre-shared key (password) required to connect to your Wi-Fi network.
 
-#### NTP (Time Synchronization) Configuration
+##### NTP (Time Synchronization) Configuration
 
 - **NTP_ENABLED**  
   *Value:* `"TRUE"` or `"FALSE"`  
@@ -148,7 +148,7 @@ Below is a detailed explanation of the configurable settings available in `setti
   *Value:* A numerical value indicating the interval (in seconds) for synchronizing time (e.g., `"3600"`)  
   *Description:* Determines how frequently the NTP sync task updates the time.
 
-#### DST (Daylight Savings Time) Configuration
+##### DST (Daylight Savings Time) Configuration
 
 - **DST_ENABLED**  
   *Value:* `"TRUE"` or `"FALSE"`  
@@ -176,7 +176,7 @@ Below is a detailed explanation of the configurable settings available in `setti
   *Value:* A string representing the NTP server address (leave empty for library-included default, e.g., `"pool.ntp.org"`)  
   *Description:* Specifies a custom NTP server for time synchronization.
 
-#### Syslog & Diagnostics Configuration
+##### Syslog & Diagnostics Configuration
 
 - **SYSLOG_SERVER_ENABLED**  
   *Value:* `"TRUE"` or `"FALSE"`  
@@ -198,7 +198,7 @@ Below is a detailed explanation of the configurable settings available in `setti
   *Value:* `"TRUE"` or `"FALSE"`  
   *Description:* When enabled, log messages are output to the console. This is useful for real-time debugging and troubleshooting.
 
-### Troubleshooting
+#### Troubleshooting
 
 If you encounter issues while running the template, consider the following checks:
 
@@ -220,15 +220,15 @@ If you encounter issues while running the template, consider the following check
   - Review the comments in both `code.py` and `settings.toml` for guidance on how each setting affects program behavior.
   - Ensure that your CircuitPython version is compatible (v9.x or later is recommended).
 
-### FAQ
+#### FAQ
 
 TBD
 
-### Known Issues
+#### Known Issues
 
 TBD
 
-### Contributing
+#### Contributing
 
 Contributions are encouraged. If you have improvements, additional templates, or new features, please submit a pull request. When contributing, please abide by the following:
 
@@ -238,10 +238,10 @@ Contributions are encouraged. If you have improvements, additional templates, or
 
 Note: If you successfully test this on a board/platform other than the RPi Pico W and 2 W, please let me know!
 
-### License
+#### License
 
 This project is licensed under the **GPL-3.0 License**. See the [LICENSE](LICENSE) file for further details.
 
-### Disclaimer
+#### Disclaimer
 
 This project is provided "as-is" without any warranties. Like everything else on the internet, use at your own risk.
