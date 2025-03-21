@@ -1,0 +1,52 @@
+# --------------------------------------------------
+# Basic Template Program - settings.toml
+# --------------------------------------------------
+
+# -----------------------------
+# Enable/Disable Network Items
+# -----------------------------
+WIFI_ENABLED = "TRUE"           # Enable or disable Wi-Fi
+
+
+# -----------------------------
+# WiFi Configuration
+# -----------------------------
+SSID = "Your_SSID"              # SSID
+PSK = "Your_PSK"                # PSK
+
+
+# -----------------------------
+# NTP Configuration
+# -----------------------------
+NTP_ENABLED = "TRUE"            # Enable or disable NTP
+NTP_OFFSET = "-8"               # Base TZ offset (in hours +/-)
+NTP_SYNC_INTERVAL = "3600"      # Sync interval for NTP
+
+## DST Configuration
+DST_ENABLED = "TRUE"            # Enable or disable DST adjustments
+DST_MODE = "dynamic"            # DST mode: "dynamic" or "static" 
+### Notes on static vs dynamic mode:
+### Dynamic Calculation: When Config.DST_MODE is set to "dynamic", the code computes DST boundaries based on the second Sunday in March and the first Sunday in November (U.S. rules).
+### Static Calculation: If Config.DST_MODE is set to any value other than "dynamic", the code uses the static DST_START and DST_END values provided in settings.toml. 
+### If DST is disabled (Config.DST_ENABLED is false), is_dst() always returns False.
+DST_OFFSET = 1                  # Additional offset (in hours) during DST
+DST_START = "03-14 02:00"       # Static DST start time (MM-DD HH:MM), used if DST_MODE is "static"
+DST_END   = "11-07 02:00"       # Static DST end time (MM-DD HH:MM), used if DST_MODE is "static"
+
+## NTP Server Configuration
+NTP_SERVER = ""                 # Leave empty to use the library's internal default (e.g., "pool.ntp.org")
+
+
+# -----------------------------
+# Syslog Server Configuration
+# -----------------------------
+SYSLOG_SERVER_ENABLED = "FALSE" # Enable or disable syslog functionality
+SYSLOG_SERVER = "10.0.0.10"     # Specify syslog server
+SYSLOG_PORT = "514"             # Port for syslog
+
+
+# -----------------------------
+# Diagnostics & Logging
+# -----------------------------
+MEMORY_MONITORING = "FALSE"     # Enable or disable memory monitoring
+CONSOLE_LOG_ENABLED = "FALSE"   # Enable or disable console logging
