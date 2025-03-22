@@ -220,6 +220,8 @@ If you encounter issues while running the template, consider the following check
   - Review the comments in both `code.py` and `settings.toml` for guidance on how each setting affects program behavior.
   - Ensure that your CircuitPython version is compatible (v9.x or later is recommended).
 
+---
+
 #### FAQ
 
 TBD
