@@ -228,7 +228,7 @@ TBD
 
 #### Known Issues
 
-TBD
+- WiFi connection errors result in unhandled exception - fixed in [this commit](https://github.com/ageagainstthemachine/CircuitPython-Program-Templates/commit/5e79f58c31436721180801bdbc912d5492274718).
 
 #### Contributing
 
