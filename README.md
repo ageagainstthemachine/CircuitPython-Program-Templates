@@ -52,6 +52,7 @@ For this template to run correctly, please ensure that the following libraries a
   - `gc` (garbage collection)
   - `asyncio` (run multiple tasks concurrently)
   - `time` (for handling time)
+  - `rtc` (for handling time updates to internal RTC)
   - `wifi` (connect to wireless networks)  
   - `socketpool` (network socket management)
   
