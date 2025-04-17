@@ -1,4 +1,4 @@
-# CircuitPython Template Program 20250320a
+# CircuitPython Template Program 20250416a
 # https://github.com/ageagainstthemachine/CircuitPython-Program-Templates
 #
 # This template demonstrates how to:
@@ -26,24 +26,26 @@ class Config:
     """
     
     # Network & Logging Flags (convert strings to booleans)
-    WIFI_ENABLED = os.getenv("WIFI_ENABLED", "false").lower() == "true"
-    NTP_ENABLED  = os.getenv("NTP_ENABLED", "false").lower() == "true"
-    SYSLOG_SERVER_ENABLED = os.getenv("SYSLOG_SERVER_ENABLED", "false").lower() == "true"
-    MEMORY_MONITORING   = os.getenv("MEMORY_MONITORING", "false").lower() == "true"
-    CONSOLE_LOG_ENABLED = os.getenv("CONSOLE_LOG_ENABLED", "false").lower() == "true"
+    WIFI_ENABLED = os.getenv("WIFI_ENABLED", "false").lower() == "true" # Enable or disable Wi-Fi (disabled by default if unset)
+    NTP_ENABLED = os.getenv("NTP_ENABLED", "false").lower() == "true" # Enable or disable NTP support (disabled by default if unset)
+    SYSLOG_SERVER_ENABLED = os.getenv("SYSLOG_SERVER_ENABLED", "false").lower() == "true" # Enable or disable syslog (disabled by default if unset)
+    MEMORY_MONITORING = os.getenv("MEMORY_MONITORING", "false").lower() == "true" # Enable or disable memory monitoring (disabled by default if unset)
+    CONSOLE_LOG_ENABLED = os.getenv("CONSOLE_LOG_ENABLED", "false").lower() == "true" # Enable or disable console logging (disabled by default if unset)
+    DEVICE_HOSTNAME = os.getenv("DEVICE_HOSTNAME", "") # Device hostname (currently only used for syslog functionality, but possibly more in the future)
 
     # WiFi Configuration: SSID and PSK for connecting to a Wi-Fi network
-    SSID = os.getenv("SSID", "")
-    PSK  = os.getenv("PSK", "")
+    SSID = os.getenv("SSID", "") # SSID (network name)
+    PSK = os.getenv("PSK", "") # PSK (pre-shared key AKA password)
 
-    # Syslog Configuration: Remote server details for syslog logging (if used)
-    SYSLOG_SERVER = os.getenv("SYSLOG_SERVER", "")
-    SYSLOG_PORT   = int(os.getenv("SYSLOG_PORT", 514))
+    # Syslog Configuration: Remote server details for syslog logging (if used) - Note: Only usyslog-circuitpython is currently supported by this framework
+    SYSLOG_SERVER = os.getenv("SYSLOG_SERVER", "") # Syslog server target (URL or IP)
+    SYSLOG_PORT = int(os.getenv("SYSLOG_PORT", 514)) # Syslog server port
+    SYSLOG_TIMESTAMP_ENABLED = os.getenv("SYSLOG_TIMESTAMP_ENABLED", "true").lower() == "true" # Syslog timestamp enabled
 
     # NTP Configuration: Parameters to synchronize time from an NTP server
-    DEFAULT_NTP_OFFSET        = -8      # Default timezone offset (in hours)
-    DEFAULT_NTP_SYNC_INTERVAL = 3600    # Default NTP sync interval (in seconds) to resync time
-    NTP_OFFSET        = int(os.getenv("NTP_OFFSET", DEFAULT_NTP_OFFSET))    # Timezone offset (in hours)
+    DEFAULT_NTP_OFFSET = -8 # Default timezone offset (in hours)
+    DEFAULT_NTP_SYNC_INTERVAL = 3600 # Default NTP sync interval (in seconds) to resync time
+    NTP_OFFSET = int(os.getenv("NTP_OFFSET", DEFAULT_NTP_OFFSET))    # Timezone offset (in hours)
     NTP_SYNC_INTERVAL = int(os.getenv("NTP_SYNC_INTERVAL", DEFAULT_NTP_SYNC_INTERVAL))  # NTP sync interval (in seconds) to resync time
     NTP_SERVER = os.getenv("NTP_SERVER", "")  # NTP server address - if empty, the NTP library default is used
 
@@ -52,7 +54,7 @@ class Config:
     DST_MODE = os.getenv("DST_MODE", "dynamic")  # "dynamic" uses computed boundaries (US); "static" uses provided dates (non-US)
     DST_OFFSET = int(os.getenv("DST_OFFSET", 1))   # Additional offset during DST (typically +1 hour)
     DST_START = os.getenv("DST_START", "03-14 02:00")  # Static DST start time (used if DST_MODE is "static")
-    DST_END   = os.getenv("DST_END", "11-07 02:00")    # Static DST end time (used if DST_MODE is "static")
+    DST_END = os.getenv("DST_END", "11-07 02:00")    # Static DST end time (used if DST_MODE is "static")
 
 ################################################################################
 #  Logging & Memory Monitoring Setup
@@ -61,7 +63,7 @@ class Config:
 # Global variable for a syslog client (if syslog is enabled and configured)
 syslog_client = None  
 
-def structured_log(message, level=0):
+def structured_log(message, level=6, tag=None):
     """
     Logs a message to the console (if enabled via configuration) and optionally
     sends the message to a remote Syslog server if a syslog client is set up.
@@ -73,12 +75,12 @@ def structured_log(message, level=0):
     # If a syslog client is available, try to send the message.
     if syslog_client:
         try:
-            syslog_client.log(level, message)
+            syslog_client.log(level, message, tag)
         except RuntimeError:
-            # Ignore errors due to transient network issues.
-            pass
+            pass  # Ignore errors due to transient network issues
 
-def monitor_memory(tag=""):
+
+def monitor_memory(mem_tag=""):
     """
     Logs current memory usage information. This can be useful to diagnose
     memory-related issues on resource-constrained devices.
@@ -92,10 +94,7 @@ def monitor_memory(tag=""):
         used_pct = (100 * used_mem / total_mem) if total_mem > 0 else 0
 
         # Build a detailed memory usage log message
-        structured_log(
-            "[Memory] " + tag + " - Free=" + str(free_mem) + " (" + "{:.2f}".format(free_pct) +
-            "%), Used=" + str(used_mem) + " (" + "{:.2f}".format(used_pct) + "%), Total=" + str(total_mem)
-        )
+        structured_log("[Memory] " + mem_tag + " - Free=" + str(free_mem) + " (" + "{:.2f}".format(free_pct) + "%), Used=" + str(used_mem) + " (" + "{:.2f}".format(used_pct) + "%), Total=" + str(total_mem), tag="memory_status")
 
 ################################################################################
 #  Conditional Wi-Fi Setup
@@ -108,6 +107,20 @@ if Config.WIFI_ENABLED:
     # Create a socket pool using the current Wi-Fi radio
     pool = socketpool.SocketPool(wifi.radio)
 
+    # Conditionally import and initialize usyslog client
+    if Config.SYSLOG_SERVER_ENABLED:
+        import usyslog
+
+        # Instantiate syslog client using socketpool and Config values
+        syslog_client = usyslog.UDPClient(
+            pool=pool, # Use the previously-created pool
+            ip=Config.SYSLOG_SERVER, # Desired server (set in settings.toml file)
+            port=Config.SYSLOG_PORT, # Desired port (set in settings.toml file)
+            tag=None,  # Tag for better RFC compliance where the default tag is None, but can be overridden in each log call
+            hostname=Config.DEVICE_HOSTNAME if Config.DEVICE_HOSTNAME else None, # Hostname for better RFC compliance (set in settings.toml if desired)
+            include_timestamp=Config.SYSLOG_TIMESTAMP_ENABLED # Timestamp enable/disable for better RFC compliance (set in settings.toml if desired)
+        )
+
     def wifi_connect_sync():
         """
         Attempts to connect to the Wi-Fi network using credentials provided in Config.
@@ -116,9 +129,9 @@ if Config.WIFI_ENABLED:
         if not wifi.radio.connected:
             try:
                 wifi.radio.connect(Config.SSID, Config.PSK)
-                structured_log("Wi-Fi connected: " + str(wifi.radio.ipv4_address))
+                structured_log("Wi-Fi connected: " + str(wifi.radio.ipv4_address), tag="wifi_connect")
             except ConnectionError as e:
-                structured_log("Wi-Fi connection failed: " + str(e))
+                structured_log("Wi-Fi connection failed: " + str(e), tag="wifi_connect")
 
     async def wifi_connect_task():
         """
@@ -129,9 +142,9 @@ if Config.WIFI_ENABLED:
             if not wifi.radio.connected:
                 try:
                     wifi.radio.connect(Config.SSID, Config.PSK)
-                    structured_log("Wi-Fi reconnected: " + str(wifi.radio.ipv4_address))
+                    structured_log("Wi-Fi reconnected: " + str(wifi.radio.ipv4_address), tag="wifi_connect")
                 except ConnectionError as e:
-                    structured_log("Wi-Fi reconnection failed: " + str(e))
+                    structured_log("Wi-Fi reconnection failed: " + str(e), tag="wifi_connect")
                     monitor_memory("During Wi-Fi reconnect")
                     await asyncio.sleep(10)  # Wait 10 seconds before trying again
             else:
@@ -261,7 +274,7 @@ if Config.NTP_ENABLED:
         """
         global time_synced
 
-        structured_log("NTP: Initializing client...")
+        structured_log("NTP: Initializing client...", tag="ntp_sync")
         try:
             # Initialize the NTP client using a raw UTC mode (tz_offset=0)
             # If a custom NTP_SERVER is specified in the configuration, use it instead of the default
@@ -269,23 +282,23 @@ if Config.NTP_ENABLED:
                 ntp = adafruit_ntp.NTP(pool, server=Config.NTP_SERVER, tz_offset=0)
             else:
                 ntp = adafruit_ntp.NTP(pool, tz_offset=0)
-            structured_log("NTP: Client initialized.")
+            structured_log("NTP: Client initialized.", tag="ntp_sync")
         except Exception as e:
             # Log any errors that occur during NTP client creation
-            structured_log("NTP: Error creating client: " + str(e))
+            structured_log("NTP: Error creating client: " + str(e), tag="ntp_sync")
             return
 
         # Enter a loop to periodically sync time.
         while True:
             try:
-                structured_log("NTP: Fetching time...")
+                structured_log("NTP: Fetching time...", tag="ntp_sync")
                 # Retrieve raw UTC time from the NTP server
                 utc_time = ntp.datetime
 
                 # Check for valid time data
                 if utc_time is None or None in [utc_time.tm_year, utc_time.tm_mon, utc_time.tm_mday,
                                                  utc_time.tm_hour, utc_time.tm_min, utc_time.tm_sec]:
-                    structured_log("NTP: Invalid response received: " + str(utc_time))
+                    structured_log("NTP: Invalid response received: " + str(utc_time), tag="ntp_sync")
                 else:
                     # Start with the base timezone offset
                     effective_offset = Config.NTP_OFFSET
@@ -306,13 +319,13 @@ if Config.NTP_ENABLED:
                         local_time.tm_sec
                     )
                     # Log the synchronized local time and the effective offset used
-                    structured_log("NTP: Time synced successfully: " + formatted_time +
-                                   " (UTC offset: " + str(effective_offset) + ")")
+                    structured_log("NTP: Time synced successfully: " + formatted_time + " (UTC offset: " + str(effective_offset) + ")", tag="ntp_sync")
+                    # Set time_synced to true since it was successful
                     time_synced = True
 
             except Exception as e:
                 # Log any errors encountered during time synchronization
-                structured_log("NTP: Error syncing time: " + str(e))
+                structured_log("NTP: Error syncing time: " + str(e), tag="ntp_sync")
 
             # Monitor and log memory usage after each sync attempt
             monitor_memory("After NTP sync")
@@ -334,7 +347,7 @@ async def dummy_task():
     This is useful for testing and ensuring the event loop remains active.
     """
     while True:
-        structured_log("Hello from dummy_task!")
+        structured_log("Hello from dummy_task!", tag="dummy_task")
         monitor_memory("dummy_task")
         await asyncio.sleep(10)
 
@@ -368,12 +381,12 @@ async def main():
             # Run all tasks concurrently
             await asyncio.gather(*tasks)
         except Exception as e:
-            structured_log("Main task error: " + str(e))
+            structured_log("Main task error: " + str(e), tag="main_error")
     else:
-        structured_log("No tasks to run. Exiting...")
+        structured_log("No tasks to run. Exiting...", tag="main_error")
 
 # Start the asyncio event loop & catch any exceptions
 try:
     asyncio.run(main())
 except Exception as e:
-    structured_log("Fatal error in asyncio loop: " + str(e))
+    structured_log("Fatal error in asyncio loop: " + str(e), tag="main_error")
