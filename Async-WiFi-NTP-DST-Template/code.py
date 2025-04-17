@@ -1,4 +1,4 @@
-# CircuitPython Template Program 20250416a
+# CircuitPython Template Program 20250417a
 # https://github.com/ageagainstthemachine/CircuitPython-Program-Templates
 #
 # This template demonstrates how to:
@@ -15,6 +15,8 @@
 import os            # Used to read environment variables (from settings.toml)
 import gc            # Garbage collection module (for memory monitoring)
 import asyncio       # Asynchronous programming library for tasks
+import rtc           # For the internal RTC
+import time          # Ensure time functions are available
 
 ################################################################################
 #  Configuration Class
@@ -163,7 +165,6 @@ time_synced = False
 
 # Check if DST adjustments are enabled in the configuration
 if Config.DST_ENABLED:
-    import time  # Import the time module for conversions and DST calculations
 
     def adjust_utc_time(utc_time, offset):
         """
@@ -265,7 +266,6 @@ else:
 # Set up the NTP section only if NTP is enabled in the configuration
 if Config.NTP_ENABLED:
     import adafruit_ntp   # Library to handle NTP synchronization
-    import time           # Ensure time functions are available
 
     async def ntp_time_sync_task():
         """
@@ -287,6 +287,8 @@ if Config.NTP_ENABLED:
             # Log any errors that occur during NTP client creation
             structured_log("NTP: Error creating client: " + str(e), tag="ntp_sync")
             return
+
+        r = rtc.RTC()  # Prepare an RTC object for setting system time
 
         # Enter a loop to periodically sync time.
         while True:
@@ -322,6 +324,8 @@ if Config.NTP_ENABLED:
                     structured_log("NTP: Time synced successfully: " + formatted_time + " (UTC offset: " + str(effective_offset) + ")", tag="ntp_sync")
                     # Set time_synced to true since it was successful
                     time_synced = True
+                    # Set the RTC so time.localtime() is actually correct
+                    r.datetime = local_time  # local_time is a time.struct_time
 
             except Exception as e:
                 # Log any errors encountered during time synchronization
