@@ -232,6 +232,7 @@ TBD
 
 #### Fixed Issues
 
+- Incorrect timestamps in syslog messages - fixed in [this commit](https://github.com/ageagainstthemachine/CircuitPython-Program-Templates/pull/4/commits/023f6803964a5ca90b0e088f538a97da04f0c231).
 - WiFi connection errors result in unhandled exception - fixed in [this commit](https://github.com/ageagainstthemachine/CircuitPython-Program-Templates/commit/5e79f58c31436721180801bdbc912d5492274718).
 
 #### Contributing
