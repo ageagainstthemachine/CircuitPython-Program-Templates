@@ -228,6 +228,10 @@ TBD
 
 #### Known Issues
 
+- The circuitpython-usyslog support needs to be implemented better (handle log severity levels more explicitly).
+
+#### Fixed Issues
+
 - WiFi connection errors result in unhandled exception - fixed in [this commit](https://github.com/ageagainstthemachine/CircuitPython-Program-Templates/commit/5e79f58c31436721180801bdbc912d5492274718).
 
 #### Contributing
