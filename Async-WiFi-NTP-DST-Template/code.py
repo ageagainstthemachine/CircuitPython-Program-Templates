@@ -130,7 +130,7 @@ if Config.WIFI_ENABLED:
             try:
                 wifi.radio.connect(Config.SSID, Config.PSK)
                 structured_log("Wi-Fi connected: " + str(wifi.radio.ipv4_address), tag="wifi_connect")
-            except (ConnectionError) as e:
+            except ConnectionError as e:
                 structured_log("Wi-Fi connection failed: " + str(e), tag="wifi_connect")
 
     async def wifi_connect_task():
@@ -143,7 +143,7 @@ if Config.WIFI_ENABLED:
                 try:
                     wifi.radio.connect(Config.SSID, Config.PSK)
                     structured_log("Wi-Fi reconnected: " + str(wifi.radio.ipv4_address), tag="wifi_connect")
-                except (ConnectionError) as e:
+                except ConnectionError as e:
                     structured_log("Wi-Fi reconnection failed: " + str(e), tag="wifi_connect")
                     monitor_memory("During Wi-Fi reconnect")
                     await asyncio.sleep(10)  # Wait 10 seconds before trying again
